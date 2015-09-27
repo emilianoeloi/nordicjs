@@ -1,0 +1,63 @@
+<script>
+var renameArgs = function(__uniq, argNames){
+	var parts = [
+		"(function(",
+			argNames.join(', '),
+		") {",
+		 "return __uniq.apply(this, arguments);",	
+		 "});"
+	];
+	return eval(parts.join(''));
+}
+var argsAsObject = function(f) {
+  var names = argNames(f);
+  return function(args) {
+    var argValues = names.map(function(name) {
+      return args[name];
+    });
+  };
+};
+var argNames = function(f){
+  var reg = /\(([\s\S]*?)\)/;
+  var head = reg.exec(f)[1];
+  var argCands = head.split(/[, \n\r\t]+/);
+  var names = argCands.filter(function(x) {
+    return x;
+  });
+  return names;
+}
+
+var fullName = function(firstName, lastName){
+  return firstName + " " + lastName;
+}
+
+fullName = renameArgs(fullName, ['first_name', 'last_name']);
+
+var fullName2 = argsAsObject(fullName);
+
+fullName2({
+	first_name: 'Emiliano',
+	last_name: 'Barbosa'
+});
+
+/// Create Object
+
+var Animal = {
+  greet: function(){
+    return this.speak() + " says " + this.name;
+  }
+}
+var Dog = Object.create(Animal);
+Dog.speak = function(){
+  return "woof";
+}
+var zelda = Object.create(Dog);
+zelda.name = "Zelda";
+
+console.log(zelda.greet());
+
+var Dog = createAndInit(Animal, {
+  speak: function(super)
+})
+
+</script>
